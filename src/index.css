@@ -5,6 +5,7 @@ body {
   background-image: url("./assets/Lastmicrobe-background.png");
   background-size: cover;
   font-family: "Poetsen One", sans-serif;
+  overflow: hidden;
   /*    */
 }
 
