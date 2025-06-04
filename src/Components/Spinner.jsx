@@ -12,12 +12,36 @@ const labels = [
   "RED mobile DNA double, one copy moves to a nearby microbe",
 ];
 
-function Spinner() {
+const colors = [
+  "#4ade80",
+  "#3b82f6",
+  "#facc15",
+  "#f87171",
+  "#a78bfa",
+  "#34d399",
+  "#f472b6",
+  "#60a5fa",
+];
+
+export default function Spinner() {
   const [rotation, setRotation] = useState(0);
+  const sliceCount = labels.length;
+  const sliceDeg = 360 / sliceCount;
 
   const spinWheel = () => {
-    const newRotation = rotation + 360 * 3 + Math.floor(Math.random() * 360);
-    setRotation(newRotation);
+    const extra = Math.floor(Math.random() * 360);
+    setRotation((r) => r + 360 * 3 + extra);
+  };
+
+  // Draw a wedge path around (0,0)
+  const describeWedge = (r, start, end) => {
+    const toRad = (d) => (Math.PI / 180) * d;
+    const x1 = r * Math.cos(toRad(start)),
+      y1 = r * Math.sin(toRad(start));
+    const x2 = r * Math.cos(toRad(end)),
+      y2 = r * Math.sin(toRad(end));
+    const large = end - start > 180 ? 1 : 0;
+    return `M0,0 L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`;
   };
 
   return (
@@ -28,64 +52,82 @@ function Spinner() {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.4 }}
     >
-      <div className="flex h-[500px] w-[800px] flex-col justify-center rounded-2xl bg-white bg-opacity-80 p-8 text-black shadow-lg">
-        {/* Spinner Wheel */}
-        <div className="relative flex flex-1 flex-col items-center justify-center gap-6">
-          {/* Pointer */}
-          <div className="z-10 mb-0 h-0 w-0 border-l-[10px] border-r-[10px] border-t-[20px] border-l-transparent border-r-transparent border-t-red-500" />
+      {/* White card */}
+      <div className="flex h-[550px] w-[850px] flex-col items-center justify-center rounded-2xl bg-white bg-opacity-80 p-8 shadow-lg">
+        {/* Pointer */}
+        <div className="z-10 mb-6 h-0 w-0 border-l-[12px] border-r-[12px] border-t-[20px] border-l-transparent border-r-transparent border-t-red-500" />
 
-          {/* Spinner Circle with Labels */}
-          <div className="relative">
-            <motion.div
-              className="relative h-96 w-96 rounded-full border-[10px] border-gray-300"
-              animate={{ rotate: rotation }}
-              transition={{ duration: 2, ease: "easeOut" }}
-              style={{
-                background:
-                  "conic-gradient(#4ade80 0deg 45deg, #3b82f6 45deg 90deg, #facc15 90deg 135deg, #f87171 135deg 180deg, #a78bfa 180deg 225deg, #34d399 225deg 270deg, #f472b6 270deg 315deg, #60a5fa 315deg 360deg)",
-              }}
-            >
-              {labels.map((label, index) => {
-                const sliceAngle = 360 / labels.length;
-                const midAngle = sliceAngle * index + sliceAngle / 2;
-                const labelOffset = -sliceAngle * 0.18; // tweak this!
-                const finalAngle = midAngle + labelOffset;
-                const distance = 40;
-                const labelWidth = 120;
+        {/* SVG wheel, centered with mx-auto */}
+        <motion.svg
+          className="mx-auto overflow-visible"
+          width={400}
+          height={400}
+          viewBox="0 0 400 400"
+          animate={{ rotate: rotation }}
+          transition={{ duration: 2, ease: "easeOut" }}
+          style={{ transformOrigin: "200px 200px", transformBox: "fill-box" }}
+        >
+          <g transform="translate(200,200)">
+            {labels.map((text, i) => {
+              const start = sliceDeg * i - 90;
+              const end = start + sliceDeg;
+              const bisector = start + sliceDeg / 2;
+              const r = 202; // radius
+              const dist = 80; // label distance
+              const boxW = 110; // box size
+              const boxH = 40;
 
-                return (
-                  <div
-                    key={index}
-                    className="absolute whitespace-nowrap text-[10px] font-medium"
-                    style={{
-                      top: "50%",
-                      left: "50%",
-                      width: `${labelWidth}px`,
-                      transform: `
-          rotate(${finalAngle}deg)
-          translate(${distance}px)
-        `,
-                      transformOrigin: "0 0",
-                    }}
-                  >
-                    {label}
-                  </div>
-                );
-              })}
-            </motion.div>
-          </div>
+              return (
+                <g key={i}>
+                  {/* slice */}
+                  <path
+                    d={describeWedge(r, start, end)}
+                    fill={colors[i]}
+                    stroke="#eee"
+                    strokeWidth="2"
+                  />
 
-          {/* Spin Button */}
-          <button
-            onClick={spinWheel}
-            className="rounded-4xl bg-green-500 px-6 py-2 font-semibold text-black shadow hover:cursor-pointer hover:bg-green-600"
-          >
-            🎯 Spin
-          </button>
-        </div>
+                  {/* wrapped label */}
+                  <g transform={`rotate(${bisector})`}>
+                    <foreignObject
+                      x={dist}
+                      y={-boxH / 2}
+                      width={boxW}
+                      height={boxH}
+                    >
+                      <div
+                        xmlns="http://www.w3.org/1999/xhtml"
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          overflow: "hidden",
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "start",
+                          fontSize: "9px",
+                          fontWeight: "500",
+                          textAlign: "left",
+                          padding: "2px",
+                        }}
+                      >
+                        {text}
+                      </div>
+                    </foreignObject>
+                  </g>
+                </g>
+              );
+            })}
+          </g>
+        </motion.svg>
+
+        {/* Spin button */}
+        <button
+          onClick={spinWheel}
+          className="rounded-4xl mt-8 bg-green-500 px-6 py-2 font-semibold text-black shadow hover:bg-green-600 hover:text-white"
+        >
+          🎯 Spin
+        </button>
       </div>
     </motion.div>
   );
 }
-
-export default Spinner;

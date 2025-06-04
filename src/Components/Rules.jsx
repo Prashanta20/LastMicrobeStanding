@@ -31,7 +31,7 @@ function Rules() {
             <div className="flex justify-center pt-6">
               <button
                 onClick={() => navigate("/")}
-                className="rounded-4xl bg-gray-300 px-6 py-2 font-semibold text-black shadow hover:cursor-pointer hover:bg-gray-400"
+                className="rounded-4xl bg-gray-300 px-6 py-2 font-semibold text-black shadow hover:cursor-pointer hover:bg-gray-400 hover:text-white"
               >
                 ⬅️ Back
               </button>
