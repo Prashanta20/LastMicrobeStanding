@@ -61,26 +61,29 @@ const outerColors = [
 ];
 
 export default function Spinner() {
-  const [rotation, setRotation] = useState(0);
+  const [innerRot, setInnerRot] = useState(0);
+  const [outerRot, setOuterRot] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState({ inner: 1, outer: "A" });
 
   const spinWheel = () => {
-    const extra = Math.floor(Math.random() * 360);
-    const newRot = rotation + 360 * 3 + extra;
-    setRotation(newRot);
+    const extraI = Math.random() * 360;
+    const extraO = Math.random() * 360;
+    const newInner = innerRot + 360 * 3 + extraI;
+    const newOuter = outerRot + 360 * 2 + extraO;
+    setInnerRot(newInner);
+    setOuterRot(newOuter);
 
     setTimeout(() => {
-      // detect inner
-      const innerDeg = 360 / innerLabels.length;
-      let innerAngle = ((newRot % 360) + innerDeg / 2 + 360) % 360;
-      const innerIndex = Math.floor(innerAngle / innerDeg) + 1;
+      const innerSlice = 360 / innerLabels.length;
+      const targetInner = ((-newInner % 360) + 360) % 360;
+      const innerIndex =
+        Math.floor(((targetInner + 90) % 360) / innerSlice) + 1;
 
-      // detect outer (opposite spin)
-      const outerDeg = 360 / outerLabels.length;
-      let outerAngle = ((-newRot % 360) + outerDeg / 2 + 360) % 360;
-      const outerIndex = Math.floor(outerAngle / outerDeg);
-      const outerLetter = String.fromCharCode(65 + outerIndex);
+      const outerSlice = 360 / outerLabels.length;
+      const targetOuter = ((newOuter % 360) + 360) % 360;
+      const outerIdx = Math.floor(((targetOuter + 90) % 360) / outerSlice);
+      const outerLetter = String.fromCharCode(65 + outerIdx);
 
       setResult({ inner: innerIndex, outer: outerLetter });
       setShowResult(true);
@@ -97,6 +100,9 @@ export default function Spinner() {
     return `M0,0 L${x1},${y1} A${r},${r} 0 ${large} 1 ${x2},${y2} Z`;
   };
 
+  const innerDeg = 360 / innerLabels.length;
+  const outerDeg = 360 / outerLabels.length;
+
   return (
     <>
       <motion.div
@@ -107,106 +113,103 @@ export default function Spinner() {
         transition={{ duration: 0.4 }}
       >
         <div className="relative flex h-[550px] w-[900px] flex-col items-center justify-center rounded-2xl bg-white bg-opacity-80 p-8 shadow-lg">
-          {/* Spinner + Legend */}
           <div className="flex w-full items-start justify-center gap-12">
-            {/* Wheel & Pointer */}
             <div className="relative flex flex-1 items-center justify-center">
-              {/* Pointer */}
-              <div className="absolute -top-4 left-1/2 z-10 h-0 w-0 -translate-x-1/2 border-b-[20px] border-l-[12px] border-r-[12px] border-b-red-500 border-l-transparent border-r-transparent" />
+              {/* Pointer on the right */}
+              <div className="absolute right-16 top-1/2 h-0 w-0 -translate-y-1/2 border-b-[12px] border-r-[20px] border-t-[12px] border-b-transparent border-r-red-500 border-t-transparent" />
 
-              {/* SVG wheel */}
-              <motion.svg
+              {/* Wheel */}
+              <svg
                 width={450}
                 height={450}
                 viewBox="0 0 450 450"
                 className="overflow-visible"
-                animate={{ rotate: rotation }}
-                transition={{ duration: 2, ease: "easeOut" }}
-                style={{
-                  transformOrigin: "225px 225px",
-                  transformBox: "fill-box",
-                }}
               >
                 <g transform="translate(225,225)">
-                  {/* Outer 16 slices */}
-                  {outerLabels.map((_, i) => {
-                    const deg = 360 / outerLabels.length;
-                    const start = deg * i - 90;
-                    const bis = start + deg / 2;
-                    return (
-                      <g key={i}>
-                        <path
-                          d={describeWedge(200, start, start + deg)}
-                          fill={outerColors[i]}
-                          stroke="#ddd"
-                          strokeWidth="2"
-                        />
-                        <g transform={`rotate(${bis})`}>
-                          <text
-                            x={160}
-                            y={0}
-                            fontSize="12"
-                            fontWeight="600"
-                            textAnchor="middle"
-                          >
-                            {String.fromCharCode(65 + i)}
-                          </text>
+                  {/* Outer (CCW) */}
+                  <motion.g
+                    animate={{ rotate: -outerRot }}
+                    transition={{ duration: 2, ease: "easeOut" }}
+                  >
+                    {outerLabels.map((_, i) => {
+                      const start = outerDeg * i - 90;
+                      return (
+                        <g key={i}>
+                          <path
+                            d={describeWedge(200, start, start + outerDeg)}
+                            fill={outerColors[i]}
+                            stroke="#ddd"
+                            strokeWidth="2"
+                          />
+                          <g transform={`rotate(${start + outerDeg / 2})`}>
+                            <text
+                              x={160}
+                              y={0}
+                              fontSize="12"
+                              fontWeight="600"
+                              textAnchor="middle"
+                            >
+                              {String.fromCharCode(65 + i)}
+                            </text>
+                          </g>
                         </g>
-                      </g>
-                    );
-                  })}
+                      );
+                    })}
+                  </motion.g>
 
-                  {/* Inner 8 slices */}
-                  {innerLabels.map((_, i) => {
-                    const deg = 360 / innerLabels.length;
-                    const start = deg * i - 90;
-                    const bis = start + deg / 2;
-                    return (
-                      <g key={i}>
-                        <path
-                          d={describeWedge(120, start, start + deg)}
-                          fill={innerColors[i]}
-                          stroke="#eee"
-                          strokeWidth="2"
-                        />
-                        <g transform={`rotate(${bis})`}>
-                          <text
-                            x={80}
-                            y={0}
-                            fontSize="16"
-                            fontWeight="bold"
-                            textAnchor="middle"
-                          >
-                            {i + 1}
-                          </text>
+                  {/* Inner (CW) */}
+                  <motion.g
+                    animate={{ rotate: innerRot }}
+                    transition={{ duration: 2, ease: "easeOut" }}
+                  >
+                    {innerLabels.map((_, i) => {
+                      const start = innerDeg * i - 90;
+                      return (
+                        <g key={i}>
+                          <path
+                            d={describeWedge(120, start, start + innerDeg)}
+                            fill={innerColors[i]}
+                            stroke="#eee"
+                            strokeWidth="2"
+                          />
+                          <g transform={`rotate(${start + innerDeg / 2})`}>
+                            <text
+                              x={80}
+                              y={0}
+                              fontSize="16"
+                              fontWeight="bold"
+                              textAnchor="middle"
+                            >
+                              {i + 1}
+                            </text>
+                          </g>
                         </g>
-                      </g>
-                    );
-                  })}
+                      );
+                    })}
+                  </motion.g>
                 </g>
-              </motion.svg>
+              </svg>
             </div>
 
             {/* Legend */}
             <div className="h-[420px] max-w-[200px] space-y-2 overflow-auto pr-2 text-sm">
-              {innerLabels.map((text, i) => (
+              {innerLabels.map((t, i) => (
                 <div key={i}>
-                  <span className="font-bold">{i + 1}.</span> {text}
+                  <span className="font-bold">{i + 1}.</span> {t}
                 </div>
               ))}
               <hr className="my-4" />
-              {outerLabels.map((text, i) => (
+              {outerLabels.map((t, i) => (
                 <div key={i}>
                   <span className="font-bold">
                     {String.fromCharCode(65 + i)}.
                   </span>{" "}
-                  {text}
+                  {t}
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Spin button */}
           <button
             onClick={spinWheel}
             className="rounded-4xl mt-6 bg-green-500 px-6 py-2 font-semibold text-black shadow hover:bg-green-600 hover:text-white"
