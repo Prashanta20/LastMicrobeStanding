@@ -1,15 +1,16 @@
-// src/Components/ResultModal.jsx
 import React from "react";
 import { motion } from "framer-motion";
+import { useLang } from "../LanguageContext";
 
 export default function ResultModal({
   onClose,
-  spinType, // "inner" or "outer"
+  spinType,
   inner,
   outer,
   labels,
   outerLabels,
 }) {
+  const { t } = useLang();
   const outerIndex = outer.charCodeAt(0) - 65;
 
   return (
@@ -28,19 +29,21 @@ export default function ResultModal({
         onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-4 text-center text-xl font-semibold">
-          {spinType === "inner"
-            ? "🎉 Inner Wheel Result 🎉"
-            : "🎉 Outer Wheel Result 🎉"}
+          {spinType === "inner" ? t("modalTitleInner") : t("modalTitleOuter")}
         </h2>
 
         {spinType === "inner" ? (
           <p>
-            <span className="font-bold">Inner ({inner}): </span>
+            <span className="font-bold">
+              {t("labelInner")} ({inner}):
+            </span>{" "}
             {labels[inner - 1]}
           </p>
         ) : (
           <p>
-            <span className="font-bold">Outer ({outer}): </span>
+            <span className="font-bold">
+              {t("labelOuter")} ({outer}):
+            </span>{" "}
             {outerLabels[outerIndex]}
           </p>
         )}

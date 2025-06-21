@@ -1,18 +1,11 @@
-import React, { useState } from "react";
+// src/Components/Spinner.jsx
+import React, { useState, useRef } from "react";
 import { motion } from "framer-motion";
 import ResultModal from "./ResultModal";
 import { useNavigate } from "react-router-dom";
+import { useLang } from "../LanguageContext";
 
-const innerLabels = [
-  "TEAL mobile DNA double, one copy moves to a nearby microbe",
-  "Remove a mobile DNA from any microbe",
-  "Remove a RED mobile DNA",
-  "Pick a new mobile DNA and add it to a microbe",
-  "Nobody moves! Mobile DNA stay where they are",
-  "Add a RED mobile DNA to any microbe",
-  "Remove a TEAL mobile DNA",
-  "RED mobile DNA double, one copy moves to a nearby microbe",
-];
+// color arrays unchanged
 const innerColors = [
   "#4ade80",
   "#3b82f6",
@@ -22,25 +15,6 @@ const innerColors = [
   "#34d399",
   "#f472b6",
   "#60a5fa",
-];
-
-const outerLabels = [
-  "All GREEN microbes and their DNA double",
-  "All PINK microbes and their DNA double",
-  "YELLOW microbes are removed unless they have TEAL mobile DNA",
-  "PINK microbes are removed unless they have RED mobile DNA",
-  "Microbes with mobile DNA are doubled",
-  "All microbes without mobile DNA are removed",
-  "ORANGE microbes are removed unless they have TEAL mobile DNA",
-  "Microbes with mobile DNA are removed",
-  "BLUE microbes with a RED mobile DNA double",
-  "GREEN microbes with a TEAL mobile DNA double",
-  "Microbes with RED mobile DNA double",
-  "Microbes with TEAL mobile DNA double",
-  "Microbes with RED mobile DNA are removed",
-  "Microbes with TEAL mobile DNA are removed",
-  "All BLUE microbes are removed, along with their mobile DNA",
-  "All ORANGE microbes are removed, along with their mobile DNA",
 ];
 const outerColors = [
   "#22c55e",
@@ -63,6 +37,15 @@ const outerColors = [
 
 export default function Spinner() {
   const navigate = useNavigate();
+  const { t } = useLang();
+
+  // translated labels
+  const innerLabels = t("innerLabels");
+  const outerLabels = t("outerLabels");
+
+  // create a single Audio instance
+  const spinSound = useRef(new Audio("/wheel-spin-click-slow-down-101152.mp3"));
+
   const [innerRot, setInnerRot] = useState(0);
   const [outerRot, setOuterRot] = useState(0);
   const [showResult, setShowResult] = useState(false);
@@ -71,10 +54,21 @@ export default function Spinner() {
 
   // Spin only the OUTER wheel
   const spinOuter = () => {
+    // play sound
+    const sfx = spinSound.current;
+    sfx.currentTime = 0;
+    sfx.play();
+
     const extraO = Math.random() * 360;
     const newOuter = outerRot + 360 * 2 + extraO;
     setOuterRot(newOuter);
     setLastSpin("outer");
+
+    // cut the sound off exactly at 2s
+    setTimeout(() => {
+      sfx.pause();
+      sfx.currentTime = 0;
+    }, 2000);
 
     setTimeout(() => {
       const slice = 360 / outerLabels.length;
@@ -89,10 +83,21 @@ export default function Spinner() {
 
   // Spin only the INNER wheel
   const spinInner = () => {
+    // play sound
+    const sfx = spinSound.current;
+    sfx.currentTime = 0;
+    sfx.play();
+
     const extraI = Math.random() * 360;
     const newInner = innerRot + 360 * 3 + extraI;
     setInnerRot(newInner);
     setLastSpin("inner");
+
+    // cut the sound off exactly at 2s
+    setTimeout(() => {
+      sfx.pause();
+      sfx.currentTime = 0;
+    }, 2000);
 
     setTimeout(() => {
       const slice = 360 / innerLabels.length;
@@ -132,8 +137,9 @@ export default function Spinner() {
             onClick={() => navigate("/")}
             className="rounded-4xl absolute bottom-4 left-4 flex items-center gap-1 p-1 text-gray-700 hover:text-white"
           >
-            ← Back
+            {t("back")}
           </button>
+
           <div className="flex w-full items-start justify-center gap-12">
             <div className="relative flex flex-1 items-center justify-center">
               {/* Pointer on the right */}
@@ -237,13 +243,13 @@ export default function Spinner() {
               onClick={spinOuter}
               className="rounded-4xl hue-rotate-270 bg-blue-500 px-6 py-2 font-semibold text-black shadow hover:bg-blue-600 hover:text-white"
             >
-              🎯 Spin Outer
+              {t("spinOuter")}
             </button>
             <button
               onClick={spinInner}
               className="rounded-4xl bg-green-500 px-6 py-2 font-semibold text-black shadow hover:bg-green-600 hover:text-white"
             >
-              🎯 Spin Inner
+              {t("spinInner")}
             </button>
           </div>
         </div>
