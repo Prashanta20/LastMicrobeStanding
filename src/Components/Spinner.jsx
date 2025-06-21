@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 import ResultModal from "./ResultModal";
+import { useNavigate } from "react-router-dom";
 
 const innerLabels = [
   "TEAL mobile DNA double, one copy moves to a nearby microbe",
@@ -49,7 +50,7 @@ const outerColors = [
   "#3b82f6",
   "#a855f7",
   "#10b981",
-  "#f87171",
+  "#f472b6",
   "#38bdf8",
   "#2dd4bf",
   "#fcd34d",
@@ -61,31 +62,44 @@ const outerColors = [
 ];
 
 export default function Spinner() {
+  const navigate = useNavigate();
   const [innerRot, setInnerRot] = useState(0);
   const [outerRot, setOuterRot] = useState(0);
   const [showResult, setShowResult] = useState(false);
   const [result, setResult] = useState({ inner: 1, outer: "A" });
+  const [lastSpin, setLastSpin] = useState(null);
 
-  const spinWheel = () => {
-    const extraI = Math.random() * 360;
+  // Spin only the OUTER wheel
+  const spinOuter = () => {
     const extraO = Math.random() * 360;
-    const newInner = innerRot + 360 * 3 + extraI;
     const newOuter = outerRot + 360 * 2 + extraO;
-    setInnerRot(newInner);
     setOuterRot(newOuter);
+    setLastSpin("outer");
 
     setTimeout(() => {
-      const innerSlice = 360 / innerLabels.length;
-      const targetInner = ((-newInner % 360) + 360) % 360;
-      const innerIndex =
-        Math.floor(((targetInner + 90) % 360) / innerSlice) + 1;
+      const slice = 360 / outerLabels.length;
+      const target = ((newOuter % 360) + 360) % 360;
+      const idx = Math.floor(((target + 90) % 360) / slice);
+      const letter = String.fromCharCode(65 + idx);
 
-      const outerSlice = 360 / outerLabels.length;
-      const targetOuter = ((newOuter % 360) + 360) % 360;
-      const outerIdx = Math.floor(((targetOuter + 90) % 360) / outerSlice);
-      const outerLetter = String.fromCharCode(65 + outerIdx);
+      setResult((prev) => ({ inner: prev.inner, outer: letter }));
+      setShowResult(true);
+    }, 2100);
+  };
 
-      setResult({ inner: innerIndex, outer: outerLetter });
+  // Spin only the INNER wheel
+  const spinInner = () => {
+    const extraI = Math.random() * 360;
+    const newInner = innerRot + 360 * 3 + extraI;
+    setInnerRot(newInner);
+    setLastSpin("inner");
+
+    setTimeout(() => {
+      const slice = 360 / innerLabels.length;
+      const target = ((-newInner % 360) + 360) % 360;
+      const idx = Math.floor(((target + 90) % 360) / slice) + 1;
+
+      setResult((prev) => ({ inner: idx, outer: prev.outer }));
       setShowResult(true);
     }, 2100);
   };
@@ -113,10 +127,17 @@ export default function Spinner() {
         transition={{ duration: 0.4 }}
       >
         <div className="relative flex h-[550px] w-[900px] flex-col items-center justify-center rounded-2xl bg-white bg-opacity-80 p-8 shadow-lg">
+          {/* back button bottom-left */}
+          <button
+            onClick={() => navigate("/")}
+            className="rounded-4xl absolute bottom-4 left-4 flex items-center gap-1 p-1 text-gray-700 hover:text-white"
+          >
+            ← Back
+          </button>
           <div className="flex w-full items-start justify-center gap-12">
             <div className="relative flex flex-1 items-center justify-center">
               {/* Pointer on the right */}
-              <div className="absolute right-16 top-1/2 h-0 w-0 -translate-y-1/2 border-b-[12px] border-r-[20px] border-t-[12px] border-b-transparent border-r-red-500 border-t-transparent" />
+              <div className="right-18 absolute top-1/2 h-0 w-0 -translate-y-1/2 border-b-[12px] border-r-[20px] border-t-[12px] border-b-transparent border-r-red-500 border-t-transparent" />
 
               {/* Wheel */}
               <svg
@@ -210,17 +231,27 @@ export default function Spinner() {
             </div>
           </div>
 
-          <button
-            onClick={spinWheel}
-            className="rounded-4xl mt-6 bg-green-500 px-6 py-2 font-semibold text-black shadow hover:bg-green-600 hover:text-white"
-          >
-            🎯 Spin
-          </button>
+          {/* Two spin buttons */}
+          <div className="mt-6 flex gap-6">
+            <button
+              onClick={spinOuter}
+              className="rounded-4xl hue-rotate-270 bg-blue-500 px-6 py-2 font-semibold text-black shadow hover:bg-blue-600 hover:text-white"
+            >
+              🎯 Spin Outer
+            </button>
+            <button
+              onClick={spinInner}
+              className="rounded-4xl bg-green-500 px-6 py-2 font-semibold text-black shadow hover:bg-green-600 hover:text-white"
+            >
+              🎯 Spin Inner
+            </button>
+          </div>
         </div>
       </motion.div>
 
       {showResult && (
         <ResultModal
+          spinType={lastSpin}
           inner={result.inner}
           outer={result.outer}
           labels={innerLabels}

@@ -26,4 +26,5 @@ button.reset {
 
 button:hover {
   background-position: center;
+  cursor: pointer;
 }

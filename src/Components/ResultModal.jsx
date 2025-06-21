@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 
 export default function ResultModal({
   onClose,
+  spinType, // "inner" or "outer"
   inner,
   outer,
   labels,
@@ -17,27 +18,32 @@ export default function ResultModal({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      onClick={onClose} // click anywhere to close
+      onClick={onClose}
     >
       <motion.div
         className="relative w-[320px] rounded-xl bg-white p-6 shadow-lg"
         initial={{ scale: 0.8, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.2 }}
-        onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+        onClick={(e) => e.stopPropagation()}
       >
         <h2 className="mb-4 text-center text-xl font-semibold">
-          🎉 You landed on 🎉
+          {spinType === "inner"
+            ? "🎉 Inner Wheel Result 🎉"
+            : "🎉 Outer Wheel Result 🎉"}
         </h2>
 
-        <p className="mb-2">
-          <span className="font-bold">Outer ({outer}): </span>
-          {outerLabels[outerIndex]}
-        </p>
-        <p>
-          <span className="font-bold">Inner ({inner}): </span>
-          {labels[inner - 1]}
-        </p>
+        {spinType === "inner" ? (
+          <p>
+            <span className="font-bold">Inner ({inner}): </span>
+            {labels[inner - 1]}
+          </p>
+        ) : (
+          <p>
+            <span className="font-bold">Outer ({outer}): </span>
+            {outerLabels[outerIndex]}
+          </p>
+        )}
       </motion.div>
     </motion.div>
   );
