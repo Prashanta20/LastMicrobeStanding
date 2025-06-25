@@ -43,6 +43,12 @@ export default function SettingsModal({
           >
             Français
           </button>
+          <button
+            onClick={() => onLanguageSelect("es")}
+            className={`rounded-4xl py-2 font-medium hover:text-white ${currentLang === "fr" ? "bg-gray-300" : "bg-gray-100"} hover:bg-gray-200`}
+          >
+            Español
+          </button>
         </div>
       </motion.div>
     </motion.div>

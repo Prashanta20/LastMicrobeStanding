@@ -1,3 +1,4 @@
+// src/Components/ResultModal.jsx
 import React from "react";
 import { motion } from "framer-motion";
 import { useLang } from "../LanguageContext";
@@ -28,7 +29,7 @@ export default function ResultModal({
         transition={{ duration: 0.2 }}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="mb-4 text-center text-xl font-semibold">
+        <h2 className="mb-4 whitespace-nowrap text-center text-xl font-semibold">
           {spinType === "inner" ? t("modalTitleInner") : t("modalTitleOuter")}
         </h2>
 

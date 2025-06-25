@@ -6,17 +6,21 @@ import gearIcon from "../assets/gear.png";
 import SettingsModal from "./SettingsModal";
 import { useLang } from "../LanguageContext";
 
+// paths to your two comics
+const comic1 = "/image1.jpg";
+const comic2 = "/image2.png";
+
 export default function Home() {
   const { t, setLang, lang } = useLang();
   const navigate = useNavigate();
   const [showSettings, setShowSettings] = useState(false);
+  const [lightboxSrc, setLightboxSrc] = useState(null);
 
   const handleLanguageSelect = (newLang) => {
     setLang(newLang);
     setShowSettings(false);
   };
 
-  // Open the appropriate PDF based on current language
   const handleHowToPlay = () => {
     const pdfPath =
       lang === "fr"
@@ -26,57 +30,89 @@ export default function Home() {
   };
 
   return (
-    <motion.div
-      className="flex h-screen w-full items-center justify-center"
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -20 }}
-      transition={{ duration: 0.4 }}
-    >
-      <div className="flex h-screen w-full items-center justify-center">
-        <div className="flex h-[500px] w-[800px] flex-col justify-between rounded-2xl bg-white bg-opacity-80 p-8 text-black shadow-lg">
-          {/* Top: Settings + Title */}
-          <div className="relative">
-            <button
-              onClick={() => setShowSettings(true)}
-              className="rounded-4xl grayscale-100 absolute left-0 top-0 flex items-center gap-2 bg-gray-300 px-4 py-2 text-sm font-medium text-black shadow transition hover:cursor-pointer hover:bg-gray-400 hover:text-white"
-            >
+    <>
+      <motion.div
+        className="flex h-screen w-full items-center justify-center"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -20 }}
+        transition={{ duration: 0.4 }}
+      >
+        <div className="flex h-screen w-full items-center justify-center">
+          <div className="flex h-[500px] w-[800px] flex-col justify-between rounded-2xl bg-white bg-opacity-80 p-8 text-black shadow-lg">
+            {/* Top: Settings + Title */}
+            <div className="relative">
+              <button
+                onClick={() => setShowSettings(true)}
+                className="rounded-4xl grayscale-100 absolute left-0 top-0 flex items-center gap-2 bg-gray-300 px-4 py-2 text-sm font-medium text-black shadow transition hover:cursor-pointer hover:bg-gray-400 hover:text-white"
+              >
+                <img
+                  src={gearIcon}
+                  alt="Settings"
+                  className="h-4 w-4 object-contain"
+                />
+                <span>{t("settings")}</span>
+              </button>
+
+              <p className="text-center text-3xl font-bold">{t("homeTitle")}</p>
+            </div>
+
+            {/* Middle: Larger thumbnails */}
+            <div className="flex justify-center gap-4">
               <img
-                src={gearIcon}
-                alt="Settings"
-                className="h-4 w-4 object-contain"
+                src={comic1}
+                alt="Comic 1"
+                className="h-32 w-auto cursor-pointer rounded shadow-md"
+                onClick={() => setLightboxSrc(comic1)}
               />
-              <span>{t("settings")}</span>
-            </button>
+              <img
+                src={comic2}
+                alt="Comic 2"
+                className="h-32 w-auto cursor-pointer rounded shadow-md"
+                onClick={() => setLightboxSrc(comic2)}
+              />
+            </div>
 
-            <p className="text-center text-3xl font-bold">{t("homeTitle")}</p>
-          </div>
-
-          {/* Bottom: Start / How to Play */}
-          <div className="flex justify-center gap-12 pb-20">
-            <button
-              onClick={() => navigate("/spinner")}
-              className="rounded-4xl px-8 py-4 font-semibold text-black shadow hue-rotate-[270deg] transition hover:cursor-pointer hover:text-white"
-            >
-              {t("start")}
-            </button>
-            <button
-              onClick={handleHowToPlay}
-              className="rounded-4xl px-8 py-4 font-semibold text-black shadow hue-rotate-0 transition hover:cursor-pointer hover:text-white"
-            >
-              {t("howToPlay")}
-            </button>
+            {/* Bottom: Start / How to Play (closer to bottom now) */}
+            <div className="flex justify-center gap-12 pb-8">
+              <button
+                onClick={() => navigate("/spinner")}
+                className="rounded-4xl px-8 py-4 font-semibold text-black shadow hue-rotate-[270deg] transition hover:cursor-pointer hover:text-white"
+              >
+                {t("start")}
+              </button>
+              <button
+                onClick={handleHowToPlay}
+                className="rounded-4xl px-8 py-4 font-semibold text-black shadow hue-rotate-0 transition hover:cursor-pointer hover:text-white"
+              >
+                {t("howToPlay")}
+              </button>
+            </div>
           </div>
         </div>
-      </div>
+        {showSettings && (
+          <SettingsModal
+            onClose={() => setShowSettings(false)}
+            onLanguageSelect={handleLanguageSelect}
+            currentLang={lang}
+          />
+        )}
+      </motion.div>
 
-      {showSettings && (
-        <SettingsModal
-          onClose={() => setShowSettings(false)}
-          onLanguageSelect={handleLanguageSelect}
-          currentLang={lang}
-        />
+      {/* Lightbox Modal */}
+      {lightboxSrc && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+          onClick={() => setLightboxSrc(null)}
+        >
+          <img
+            src={lightboxSrc}
+            alt="Full comic"
+            className="max-h-full max-w-full rounded"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
       )}
-    </motion.div>
+    </>
   );
 }

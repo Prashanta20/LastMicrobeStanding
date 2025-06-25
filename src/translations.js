@@ -94,4 +94,52 @@ export const translations = {
     labelInner: "Interne",
     labelOuter: "Externe",
   },
+
+  es: {
+    // Spanish UI
+    homeTitle: "Último Microbio en Pie",
+    start: "▶️ INICIAR",
+    howToPlay: "📜 CÓMO JUGAR",
+    settings: "Configuración",
+    back: "← Volver",
+
+    // Spanish inner wheel (8)
+    innerLabels: [
+      "Duplica los elementos de ADN móvil VERDE TURQUESA, y mueve una copia a un microbio vecino",
+      "Remueve un elemento de ADN móvil de cualquier microbio",
+      "Remueve un elemento de ADN móvil ROJO de cualquier microbio",
+      "Escoge un nuevo elemento de ADN móvil y añádelo a cualquier microbio",
+      "¡Nadie se mueva! Elementos de ADN móvil se quedan donde están",
+      "Añade un elemento de ADN móvil ROJO a cualquier microbio",
+      "Remueve un elemento de ADN móvil VERDE TURQUESA de cualquier microbio",
+      "Duplica los elementos de ADN móvil ROJO, y mueve una copia a un microbio vecino",
+    ],
+
+    // Spanish outer wheel (16)
+    outerLabels: [
+      "Duplica todos los microbios VERDES y sus contenidos de ADN móvil",
+      "Duplica todos los microbios ROSAS y sus contenidos de ADN móvil",
+      "Remueve todos los microbios AMARILLOS a menos que tengan ADN móvil VERDE TURQUESA",
+      "Remueve todos los microbios ROSAS a menos que tengan ADN móvil ROJO",
+      "Duplica todos los microbios con contenidos de ADN móvil",
+      "Remueve todos los microbios que no contengan ADN móvil",
+      "Remueve todos los microbios NARANJAS a menos que tengan ADN móvil VERDE TURQUESA",
+      "Remueve todos los microbios que contengan ADN móvil",
+      "Duplica los microbios AZULES que contengan ADN móvil ROJO",
+      "Duplica los microbios VERDES que contengan ADN móvil VERDE TURQUESA",
+      "Duplica los microbios que contengan ADN móvil ROJO",
+      "Duplica los microbios que contengan ADN móvil VERDE TURQUESA",
+      "Remueve los microbios que contengan ADN móvil ROJO",
+      "Remueve los microbios que contengan ADN móvil VERDE TURQUESA",
+      "Remueve todos los microbios AZULES y su contenido de ADN móvil",
+      "Remueve todos los microbios NARANJAS y su contenido de ADN móvil",
+    ],
+
+    spinOuter: "🎯 Giro Exterior",
+    spinInner: "🎯 Giro Interior",
+    modalTitleInner: "🎉 Resultado Rueda Interna 🎉",
+    modalTitleOuter: "🎉 Resultado Rueda Externa 🎉",
+    labelInner: "Interna",
+    labelOuter: "Externa",
+  },
 };
