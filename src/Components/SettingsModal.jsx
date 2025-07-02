@@ -2,6 +2,10 @@
 import React from "react";
 import { motion } from "framer-motion";
 import { useLang } from "../LanguageContext";
+import clickSoundFile from "/button-click.mp3";
+
+const clickAudio = new Audio(clickSoundFile);
+clickAudio.volume = 0.5;
 
 export default function SettingsModal({
   onClose,
@@ -9,6 +13,13 @@ export default function SettingsModal({
   currentLang,
 }) {
   const { t } = useLang();
+
+  // helper to fire both sound + language switch
+  const handleSelect = (langCode) => {
+    clickAudio.currentTime = 0;
+    clickAudio.play();
+    onLanguageSelect(langCode);
+  };
 
   return (
     <motion.div
@@ -32,20 +43,26 @@ export default function SettingsModal({
         <p className="mb-2 text-center">Choose Language:</p>
         <div className="flex flex-col gap-3">
           <button
-            onClick={() => onLanguageSelect("en")}
-            className={`rounded-4xl py-2 font-medium hover:text-white ${currentLang === "en" ? "bg-gray-300" : "bg-gray-100"} hover:bg-gray-200`}
+            onClick={() => handleSelect("en")}
+            className={`rounded-4xl py-2 font-medium hover:text-white ${
+              currentLang === "en" ? "bg-gray-300" : "bg-gray-100"
+            } hover:bg-gray-200`}
           >
             English
           </button>
           <button
-            onClick={() => onLanguageSelect("fr")}
-            className={`rounded-4xl py-2 font-medium hover:text-white ${currentLang === "fr" ? "bg-gray-300" : "bg-gray-100"} hover:bg-gray-200`}
+            onClick={() => handleSelect("fr")}
+            className={`rounded-4xl py-2 font-medium hover:text-white ${
+              currentLang === "fr" ? "bg-gray-300" : "bg-gray-100"
+            } hover:bg-gray-200`}
           >
             Français
           </button>
           <button
-            onClick={() => onLanguageSelect("es")}
-            className={`rounded-4xl py-2 font-medium hover:text-white ${currentLang === "fr" ? "bg-gray-300" : "bg-gray-100"} hover:bg-gray-200`}
+            onClick={() => handleSelect("es")}
+            className={`rounded-4xl py-2 font-medium hover:text-white ${
+              currentLang === "es" ? "bg-gray-300" : "bg-gray-100"
+            } hover:bg-gray-200`}
           >
             Español
           </button>

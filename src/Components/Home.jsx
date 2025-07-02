@@ -6,15 +6,20 @@ import gearIcon from "../assets/gear.png";
 import SettingsModal from "./SettingsModal";
 import { useLang } from "../LanguageContext";
 
-// paths to your two comics
-const comic1 = "/image1.jpg";
-const comic2 = "/image2.png";
+// for each language, list the two thumbnails in public/
+const comics = {
+  en: ["/full color night club English.png", "/full color plants English.png"],
+  fr: ["/full color night club French.png", "/full color plants French.png"],
+  es: ["/full color night club spanish.png", "/full color plants spanish.png"],
+};
 
 export default function Home() {
   const { t, setLang, lang } = useLang();
   const navigate = useNavigate();
+
   const [showSettings, setShowSettings] = useState(false);
-  const [lightboxSrc, setLightboxSrc] = useState(null);
+  // no TS annotation here, just null or 0/1 index
+  const [comicIndex, setComicIndex] = useState(null);
 
   const handleLanguageSelect = (newLang) => {
     setLang(newLang);
@@ -28,6 +33,9 @@ export default function Home() {
         : "/English_Last_microbe_standing_27July2022.pdf";
     window.open(pdfPath, "_blank");
   };
+
+  // pick the right pair of thumbnails
+  const thumbs = comics[lang] || comics.en;
 
   return (
     <>
@@ -57,24 +65,21 @@ export default function Home() {
               <p className="text-center text-3xl font-bold">{t("homeTitle")}</p>
             </div>
 
-            {/* Middle: Larger thumbnails */}
-            <div className="flex justify-center gap-4">
-              <img
-                src={comic1}
-                alt="Comic 1"
-                className="h-32 w-auto cursor-pointer rounded shadow-md"
-                onClick={() => setLightboxSrc(comic1)}
-              />
-              <img
-                src={comic2}
-                alt="Comic 2"
-                className="h-32 w-auto cursor-pointer rounded shadow-md"
-                onClick={() => setLightboxSrc(comic2)}
-              />
+            {/* Center: Comic thumbnails */}
+            <div className="my-4 flex justify-center gap-6">
+              {thumbs.map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt={`Comic ${i + 1}`}
+                  className="h-32 w-auto cursor-pointer rounded shadow transition hover:scale-[1.02]"
+                  onClick={() => setComicIndex(i)}
+                />
+              ))}
             </div>
 
-            {/* Bottom: Start / How to Play (closer to bottom now) */}
-            <div className="flex justify-center gap-12 pb-8">
+            {/* Bottom: Start / How to Play */}
+            <div className="flex justify-center gap-12 pb-12">
               <button
                 onClick={() => navigate("/spinner")}
                 className="rounded-4xl px-8 py-4 font-semibold text-black shadow hue-rotate-[270deg] transition hover:cursor-pointer hover:text-white"
@@ -90,6 +95,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+
         {showSettings && (
           <SettingsModal
             onClose={() => setShowSettings(false)}
@@ -99,19 +105,25 @@ export default function Home() {
         )}
       </motion.div>
 
-      {/* Lightbox Modal */}
-      {lightboxSrc && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
-          onClick={() => setLightboxSrc(null)}
+      {/* Comic Lightbox */}
+      {comicIndex !== null && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          onClick={() => setComicIndex(null)}
         >
-          <img
-            src={lightboxSrc}
-            alt="Full comic"
-            className="max-h-full max-w-full rounded"
+          <motion.img
+            src={thumbs[comicIndex]}
+            alt="Full Comic"
+            className="max-h-[90%] max-w-[90%] rounded shadow-lg"
+            initial={{ scale: 0.8 }}
+            animate={{ scale: 1 }}
+            transition={{ duration: 0.2 }}
             onClick={(e) => e.stopPropagation()}
           />
-        </div>
+        </motion.div>
       )}
     </>
   );
