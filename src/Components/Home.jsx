@@ -27,10 +27,7 @@ export default function Home() {
   };
 
   const handleHowToPlay = () => {
-    const pdfPath =
-      lang === "fr"
-        ? "/French_Last_microbe_standing_Rules.pdf"
-        : "/English_Last_microbe_standing_27July2022.pdf";
+    const pdfPath = lang === "fr" ? "/LMS_French.pdf" : "/LMS_English.pdf";
     window.open(pdfPath, "_blank");
   };
 
